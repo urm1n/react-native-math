@@ -16,6 +16,7 @@
 #include <NitroModules/HybridObjectRegistry.hpp>
 
 #include "JHybridMathSpec.hpp"
+#include <NitroModules/DefaultConstructableObject.hpp>
 
 namespace margelo::nitro::math {
 
@@ -29,7 +30,14 @@ int initialize(JavaVM* vm) {
     margelo::nitro::math::JHybridMathSpec::registerNatives();
 
     // Register Nitro Hybrid Objects
-    
+    HybridObjectRegistry::registerHybridObjectConstructor(
+      "Math",
+      []() -> std::shared_ptr<HybridObject> {
+        static DefaultConstructableObject<JHybridMathSpec::javaobject> object("com/margelo/nitro/math/HybridMath");
+        auto instance = object.create();
+        return instance->cthis()->shared();
+      }
+    );
   });
 }
 
